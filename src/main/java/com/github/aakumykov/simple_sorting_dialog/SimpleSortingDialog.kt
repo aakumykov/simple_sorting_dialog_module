@@ -9,8 +9,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.github.aakumykov.simple_sorting_dialog.databinding.DialogSortingBinding
 import com.google.gson.Gson
+import kotlin.jvm.java
 
-class SortingDialog : DialogFragment() {
+class SimpleSortingDialog : DialogFragment() {
 
     private var _binding: DialogSortingBinding? = null
     private val binding: DialogSortingBinding get() = _binding!!
@@ -62,7 +63,7 @@ class SortingDialog : DialogFragment() {
     }
 
     override fun onCancel(dialog: DialogInterface) {
-        _callbacks?.onCancelled()
+        _callbacks?.onSortingCancelled()
         super.onCancel(dialog)
     }
 
@@ -88,31 +89,31 @@ class SortingDialog : DialogFragment() {
         }
     }
 
-    fun display(fragmentManager: FragmentManager): SortingDialog {
+    fun display(fragmentManager: FragmentManager): SimpleSortingDialog {
         show(fragmentManager, TAG)
         return this
     }
 
     interface Callbacks {
         fun onSortingApplied(sortingSettings: SortingSettings)
-        fun onCancelled()
+        fun onSortingCancelled(){}
     }
 
 
-    fun setCallbacks(callbacks: Callbacks): SortingDialog {
+    fun setCallbacks(callbacks: Callbacks): SimpleSortingDialog {
         _callbacks = callbacks
         return this
     }
 
     companion object {
-        val TAG: String = SortingDialog::class.java.simpleName
+        val TAG: String = SimpleSortingDialog::class.java.simpleName
         const val INITIAL_SETTINGS = "INITIAL_SETTINGS"
 
-        fun  createAndShow(
+        fun createAndShow(
             fragmentManager: FragmentManager,
             initialSettings: SortingSettings? = null
-        ): SortingDialog {
-            return SortingDialog()
+        ): SimpleSortingDialog {
+            return SimpleSortingDialog()
                 .apply {
                     arguments = bundleOf(
                         INITIAL_SETTINGS to Gson().toJson(initialSettings),
@@ -121,9 +122,9 @@ class SortingDialog : DialogFragment() {
                 .display(fragmentManager)
         }
 
-        fun  find(fragmentManager: FragmentManager): SortingDialog? {
+        fun  find(fragmentManager: FragmentManager): SimpleSortingDialog? {
             return fragmentManager.findFragmentByTag(TAG)?.let {
-                it as? SortingDialog
+                it as? SimpleSortingDialog
             }
         }
     }
