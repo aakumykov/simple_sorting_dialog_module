@@ -5,5 +5,5 @@
     <string name="sorting_dialog_mode_m_time">Modification time</string>
     <string name="sorting_dialog_flag_reverse_order">Reverse order</string>
     <string name="sorting_dialog_flag_folders_first">Folders first</string>
-    <string name="sorting_dialog_button_apply">Appply</string>
+    <string name="sorting_dialog_button_apply">Apply</string>
 </resources>
