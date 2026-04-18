@@ -11,13 +11,12 @@ import com.github.aakumykov.simple_sorting_dialog.databinding.DialogSortingBindi
 import com.google.gson.Gson
 import kotlin.jvm.java
 
-class SimpleSortingDialog<ExternalSortingMode> : DialogFragment() {
+class SimpleSortingDialog : DialogFragment() {
 
     private var _binding: DialogSortingBinding? = null
     private val binding: DialogSortingBinding get() = _binding!!
 
     private var _callbacks: Callbacks? = null
-    private var _translator: Translator<ExternalSortingMode>? = null
 
     private val initialSettings: SortingSettings? get() {
         return arguments?.getString(INITIAL_SETTINGS)?.let {
@@ -25,15 +24,13 @@ class SimpleSortingDialog<ExternalSortingMode> : DialogFragment() {
         }
     }
 
-    private val currentSortingSettings: SortingSettings<ExternalSortingMode>
+    private val currentSortingSettings: SortingSettings
         get() {
-            val simpleSortingMode = viewId2sortingMode(binding.sortingModeSelector.checkedRadioButtonId)
-            val externalSortingMode = _translator?.simpleSortingMode2externalMode(simpleSortingMode)
-            return SortingSettings<ExternalSortingMode>(
-                sortingMode = externalSortingMode,
-                reverseOrder = binding.reverseOrderCheckbox.isChecked,
-                foldersFirst = binding.foldersFirstCheckbox.isChecked
-            )
+        return SortingSettings(
+            sortingMode = viewId2sortingMode(binding.sortingModeSelector.checkedRadioButtonId),
+            reverseOrder = binding.reverseOrderCheckbox.isChecked,
+            foldersFirst = binding.foldersFirstCheckbox.isChecked
+        )
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -71,7 +68,6 @@ class SimpleSortingDialog<ExternalSortingMode> : DialogFragment() {
     }
 
     override fun onDestroyView() {
-        _translator = null
         _callbacks = null
         _binding = null
         super.onDestroyView()
@@ -93,7 +89,7 @@ class SimpleSortingDialog<ExternalSortingMode> : DialogFragment() {
         }
     }
 
-    fun display(fragmentManager: FragmentManager): SimpleSortingDialog<ExternalSortingMode> {
+    fun display(fragmentManager: FragmentManager): SimpleSortingDialog {
         show(fragmentManager, TAG)
         return this
     }
@@ -103,29 +99,21 @@ class SimpleSortingDialog<ExternalSortingMode> : DialogFragment() {
         fun onSortingCancelled(){}
     }
 
-    interface Translator<ExternalSortingMode> {
-        fun externalMode2simpleSortingMode(externalMode: ExternalSortingMode): SimpleSortingMode
-        fun simpleSortingMode2externalMode(simpleSortingMode: SimpleSortingMode): ExternalSortingMode
-    }
 
-    fun setCallbacks(callbacks: Callbacks): SimpleSortingDialog<ExternalSortingMode> {
+    fun setCallbacks(callbacks: Callbacks): SimpleSortingDialog {
         _callbacks = callbacks
         return this
-    }
-
-    fun setTranslator(translator: Translator<ExternalSortingMode>) {
-        _translator = translator
     }
 
     companion object {
         val TAG: String = SimpleSortingDialog::class.java.simpleName
         const val INITIAL_SETTINGS = "INITIAL_SETTINGS"
 
-        fun <ExternalSortingMode> createAndShow(
+        fun createAndShow(
             fragmentManager: FragmentManager,
             initialSettings: SortingSettings? = null
-        ): SimpleSortingDialog<ExternalSortingMode> {
-            return SimpleSortingDialog<ExternalSortingMode>()
+        ): SimpleSortingDialog {
+            return SimpleSortingDialog()
                 .apply {
                     arguments = bundleOf(
                         INITIAL_SETTINGS to Gson().toJson(initialSettings),
@@ -134,9 +122,9 @@ class SimpleSortingDialog<ExternalSortingMode> : DialogFragment() {
                 .display(fragmentManager)
         }
 
-        fun <ExternalSortingMode> find(fragmentManager: FragmentManager): SimpleSortingDialog<ExternalSortingMode>? {
+        fun  find(fragmentManager: FragmentManager): SimpleSortingDialog? {
             return fragmentManager.findFragmentByTag(TAG)?.let {
-                it as? SimpleSortingDialog<ExternalSortingMode>
+                it as? SimpleSortingDialog
             }
         }
     }
