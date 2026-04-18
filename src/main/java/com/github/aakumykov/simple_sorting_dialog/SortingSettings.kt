@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import java.io.Serializable
 
 data class SortingSettings(
-    val sortingMode: SimpleSortingMode,
+    val sortingMode: SimpleSortingDialog.SortingMode,
     val reverseOrder: Boolean,
     val foldersFirst: Boolean
 ): Serializable {

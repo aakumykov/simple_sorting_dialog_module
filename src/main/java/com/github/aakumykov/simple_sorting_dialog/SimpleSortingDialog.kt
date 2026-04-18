@@ -73,19 +73,19 @@ class SimpleSortingDialog : DialogFragment() {
         super.onDestroyView()
     }
 
-    private fun sortingMode2viewId(sortingMode: SimpleSortingMode): Int {
+    private fun sortingMode2viewId(sortingMode: SortingMode): Int {
         return when(sortingMode) {
-            SimpleSortingMode.NAME -> R.id.sortingModeByName
-            SimpleSortingMode.SIZE -> R.id.sortingModeBySize
-            SimpleSortingMode.M_TIME -> R.id.sortingModeByMTime
+            SortingMode.NAME -> R.id.sortingModeByName
+            SortingMode.SIZE -> R.id.sortingModeBySize
+            SortingMode.M_TIME -> R.id.sortingModeByMTime
         }
     }
 
-    private fun viewId2sortingMode(viewId: Int): SimpleSortingMode {
+    private fun viewId2sortingMode(viewId: Int): SortingMode {
         return when(viewId) {
-            R.id.sortingModeBySize -> SimpleSortingMode.SIZE
-            R.id.sortingModeByMTime -> SimpleSortingMode.M_TIME
-            else -> SimpleSortingMode.NAME
+            R.id.sortingModeBySize -> SortingMode.SIZE
+            R.id.sortingModeByMTime -> SortingMode.M_TIME
+            else -> SortingMode.NAME
         }
     }
 
@@ -127,5 +127,9 @@ class SimpleSortingDialog : DialogFragment() {
                 it as? SimpleSortingDialog
             }
         }
+    }
+
+    enum class SortingMode {
+        NAME, SIZE, M_TIME
     }
 }
