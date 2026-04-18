@@ -1,0 +1,9 @@
+<resources>
+    <string name="sorting_dialog_title">Sort by</string>
+    <string name="sorting_dialog_mode_name">Name</string>
+    <string name="sorting_dialog_mode_size">Size</string>
+    <string name="sorting_dialog_mode_m_time">Modification time</string>
+    <string name="sorting_dialog_flag_reverse_order">Reverse order</string>
+    <string name="sorting_dialog_flag_folders_first">Folders first</string>
+    <string name="sorting_dialog_button_apply">Appply</string>
+</resources>

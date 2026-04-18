@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sorting_dialog_title">Сортировать по</string>
+    <string name="sorting_dialog_mode_name">Имени</string>
+    <string name="sorting_dialog_mode_size">Размеру</string>
+    <string name="sorting_dialog_mode_m_time">Времени изменения</string>
+    <string name="sorting_dialog_flag_reverse_order">В обратном порядке</string>
+    <string name="sorting_dialog_flag_folders_first">Сначала каталоги</string>
+    <string name="sorting_dialog_button_apply">Применить</string>
+</resources>

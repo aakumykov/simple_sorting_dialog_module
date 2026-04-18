@@ -1,0 +1,130 @@
+package com.github.aakumykov.simple_sorting_dialog
+
+import android.app.AlertDialog
+import android.app.Dialog
+import android.content.DialogInterface
+import android.os.Bundle
+import androidx.core.os.bundleOf
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
+import com.github.aakumykov.simple_sorting_dialog.databinding.DialogSortingBinding
+import com.google.gson.Gson
+
+class SortingDialog : DialogFragment() {
+
+    private var _binding: DialogSortingBinding? = null
+    private val binding: DialogSortingBinding get() = _binding!!
+
+    private var _callbacks: Callbacks? = null
+
+    private val initialSettings: SortingSettings? get() {
+        return arguments?.getString(INITIAL_SETTINGS)?.let {
+            Gson().fromJson(it, SortingSettings::class.java)
+        }
+    }
+
+    private val currentSortingSettings: SortingSettings
+        get() {
+        return SortingSettings(
+            sortingMode = viewId2sortingMode(binding.sortingModeSelector.checkedRadioButtonId),
+            reverseOrder = binding.reverseOrderCheckbox.isChecked,
+            foldersFirst = binding.foldersFirstCheckbox.isChecked
+        )
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+
+        _binding = DialogSortingBinding.inflate(layoutInflater)
+
+        binding.applyButton.setOnClickListener { onApplyClicked() }
+
+        applyInitialSettings()
+
+        return AlertDialog.Builder(requireContext())
+            .setTitle(R.string.sorting_dialog_title)
+            .setView(binding.root)
+            .create()
+    }
+
+    private fun applyInitialSettings() {
+        initialSettings?.also {
+            binding.apply {
+                sortingModeSelector.check(sortingMode2viewId(it.sortingMode))
+                reverseOrderCheckbox.isChecked = it.reverseOrder
+                foldersFirstCheckbox.isChecked = it.foldersFirst
+            }
+        }
+    }
+
+    private fun onApplyClicked() {
+        _callbacks?.onSortingApplied(currentSortingSettings)
+        dismiss()
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        _callbacks?.onCancelled()
+        super.onCancel(dialog)
+    }
+
+    override fun onDestroyView() {
+        _callbacks = null
+        _binding = null
+        super.onDestroyView()
+    }
+
+    private fun sortingMode2viewId(sortingMode: SimpleSortingMode): Int {
+        return when(sortingMode) {
+            SimpleSortingMode.NAME -> R.id.sortingModeByName
+            SimpleSortingMode.SIZE -> R.id.sortingModeBySize
+            SimpleSortingMode.M_TIME -> R.id.sortingModeByMTime
+        }
+    }
+
+    private fun viewId2sortingMode(viewId: Int): SimpleSortingMode {
+        return when(viewId) {
+            R.id.sortingModeBySize -> SimpleSortingMode.SIZE
+            R.id.sortingModeByMTime -> SimpleSortingMode.M_TIME
+            else -> SimpleSortingMode.NAME
+        }
+    }
+
+    fun display(fragmentManager: FragmentManager): SortingDialog {
+        show(fragmentManager, TAG)
+        return this
+    }
+
+    interface Callbacks {
+        fun onSortingApplied(sortingSettings: SortingSettings)
+        fun onCancelled()
+    }
+
+
+    fun setCallbacks(callbacks: Callbacks): SortingDialog {
+        _callbacks = callbacks
+        return this
+    }
+
+    companion object {
+        val TAG: String = SortingDialog::class.java.simpleName
+        const val INITIAL_SETTINGS = "INITIAL_SETTINGS"
+
+        fun  createAndShow(
+            fragmentManager: FragmentManager,
+            initialSettings: SortingSettings? = null
+        ): SortingDialog {
+            return SortingDialog()
+                .apply {
+                    arguments = bundleOf(
+                        INITIAL_SETTINGS to Gson().toJson(initialSettings),
+                    )
+                }
+                .display(fragmentManager)
+        }
+
+        fun  find(fragmentManager: FragmentManager): SortingDialog? {
+            return fragmentManager.findFragmentByTag(TAG)?.let {
+                it as? SortingDialog
+            }
+        }
+    }
+}
