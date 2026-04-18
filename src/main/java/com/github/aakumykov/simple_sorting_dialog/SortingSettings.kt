@@ -3,8 +3,8 @@ package com.github.aakumykov.simple_sorting_dialog
 import com.google.gson.Gson
 import java.io.Serializable
 
-data class SortingSettings(
-    val sortingMode: SimpleSortingMode,
+data class SortingSettings<ExternalSortingMode>(
+    val sortingMode: ExternalSortingMode,
     val reverseOrder: Boolean,
     val foldersFirst: Boolean
 ): Serializable {
@@ -21,7 +21,7 @@ data class SortingSettings(
     }
 
     companion object {
-        fun fromJSON(json: String, gson: Gson): SortingSettings {
+        fun fromJSON(json: String, gson: Gson): SortingSettings<*> {
             return gson.fromJson(json, SortingSettings::class.java)
         }
     }
