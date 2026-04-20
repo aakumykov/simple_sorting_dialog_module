@@ -2,11 +2,13 @@ package com.github.aakumykov.simple_sorting_dialog
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
+import androidx.preference.PreferenceManager
 import com.github.aakumykov.simple_sorting_dialog.databinding.DialogSortingBinding
 import com.github.aakumykov.simple_sorting_dialog.extensions.getBooleanFromPreferences
 import com.github.aakumykov.simple_sorting_dialog.extensions.getStringFromPreferences
@@ -26,9 +28,7 @@ class SimpleSortingDialog : DialogFragment() {
 
 
     private val initialSortingMode: SortingMode get() {
-        val s = arguments?.getString(INITIAL_SORTING_MODE)
-        return try { SortingMode.valueOf(s!!) }
-        catch (_: Exception) { defaultSortingMode }
+        return sortingModeFromString(arguments?.getString(INITIAL_SORTING_MODE))
     }
 
     private val initialReverseOrder: Boolean
@@ -45,6 +45,8 @@ class SimpleSortingDialog : DialogFragment() {
             foldersFirst = binding.foldersFirstCheckbox.isChecked
         )
 
+//    private val currentSortingMode: SortingMode
+//        get() =  ?: defaultSortingMode
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
@@ -93,27 +95,25 @@ class SimpleSortingDialog : DialogFragment() {
     }
 
     private fun storeSettings() {
-        storeStringInPreferences(SORTING_MODE, sortingSettingsFromGUI.sortingMode.name)
-        storeBooleanInPreferences(REVERSE_ORDER, sortingSettingsFromGUI.reverseOrder)
-        storeBooleanInPreferences(FOLDERS_FIRST, sortingSettingsFromGUI.foldersFirst)
+        storeStringInPreferences(CURRENT_SORTING_MODE, sortingSettingsFromGUI.sortingMode.name)
+        storeBooleanInPreferences(CURRENT_REVERSE_ORDER, sortingSettingsFromGUI.reverseOrder)
+        storeBooleanInPreferences(CURRENT_FOLDERS_FIRST, sortingSettingsFromGUI.foldersFirst)
     }
 
     private fun restoreSettings() {
         binding.apply {
             sortingModeSelector.check(getViewIdForStoredSortingMode())
-            reverseOrderCheckbox.isChecked = getBooleanFromPreferences(REVERSE_ORDER, defaultReverseOrder)
-            foldersFirstCheckbox.isChecked = getBooleanFromPreferences(FOLDERS_FIRST, defaultFoldersFirst)
+            reverseOrderCheckbox.isChecked = getBooleanFromPreferences(CURRENT_REVERSE_ORDER, defaultReverseOrder)
+            foldersFirstCheckbox.isChecked = getBooleanFromPreferences(CURRENT_FOLDERS_FIRST, defaultFoldersFirst)
         }
     }
 
     private fun getViewIdForStoredSortingMode(): Int {
-        return try {
-            getStringFromPreferences(SORTING_MODE).let { SortingMode.valueOf(it!!) }
-        } catch (_: Exception) {
-            defaultSortingMode
-        }.let { savedSortingMode ->
-            sortingMode2viewId(savedSortingMode)
-        }
+        return sortingMode2viewId(
+            sortingModeFromString(
+                getStringFromPreferences(CURRENT_SORTING_MODE)
+            )
+        )
     }
 
     private fun sortingMode2viewId(sortingMode: SortingMode): Int {
@@ -151,6 +151,24 @@ class SimpleSortingDialog : DialogFragment() {
     companion object {
         val TAG: String = SimpleSortingDialog::class.java.simpleName
 
+        private fun sortingModeFromString(s: String?): SortingMode {
+            return try { SortingMode.valueOf(s!!) }
+            catch (_: Exception) { defaultSortingMode }
+        }
+
+        fun getLastSortingSettings(context: Context): SortingSettings {
+            PreferenceManager.getDefaultSharedPreferences(context).apply {
+                val sm = sortingModeFromString(CURRENT_SORTING_MODE)
+                val ro = getBoolean(CURRENT_REVERSE_ORDER, defaultReverseOrder)
+                val ff = getBoolean(CURRENT_FOLDERS_FIRST, defaultFoldersFirst)
+                return SortingSettings(
+                    sortingMode = sm,
+                    reverseOrder = ro,
+                    foldersFirst = ff
+                )
+            }
+        }
+
         private val defaultSortingMode: SortingMode = SortingMode.NAME
         const val defaultReverseOrder: Boolean = false
         const val defaultFoldersFirst: Boolean = true
@@ -161,9 +179,9 @@ class SimpleSortingDialog : DialogFragment() {
 
         const val FIRST_RUN = "FIRST_RUN"
 
-        const val SORTING_MODE = "SORTING_MODE"
-        const val REVERSE_ORDER = "REVERSE_ORDER"
-        const val FOLDERS_FIRST = "FOLDERS_FIRST"
+        const val CURRENT_SORTING_MODE = "CURRENT_SORTING_MODE"
+        const val CURRENT_REVERSE_ORDER = "CURRENT_REVERSE_ORDER"
+        const val CURRENT_FOLDERS_FIRST = "CURRENT_FOLDERS_FIRST"
 
         fun createAndShow(
             fragmentManager: FragmentManager,
