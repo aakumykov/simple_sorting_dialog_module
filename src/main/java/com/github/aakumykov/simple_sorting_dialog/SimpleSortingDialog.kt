@@ -28,7 +28,7 @@ class SimpleSortingDialog : DialogFragment() {
     private val initialSortingMode: SortingMode get() {
         val s = arguments?.getString(INITIAL_SORTING_MODE)
         return try { SortingMode.valueOf(s!!) }
-        catch (e: IllegalArgumentException) { defaultSortingMode }
+        catch (_: Exception) { defaultSortingMode }
     }
 
     private val initialReverseOrder: Boolean
@@ -109,7 +109,7 @@ class SimpleSortingDialog : DialogFragment() {
     private fun getViewIdForStoredSortingMode(): Int {
         return try {
             getStringFromPreferences(SORTING_MODE).let { SortingMode.valueOf(it!!) }
-        } catch (e: IllegalArgumentException) {
+        } catch (_: Exception) {
             defaultSortingMode
         }.let { savedSortingMode ->
             sortingMode2viewId(savedSortingMode)
@@ -150,9 +150,10 @@ class SimpleSortingDialog : DialogFragment() {
 
     companion object {
         val TAG: String = SimpleSortingDialog::class.java.simpleName
-        val defaultSortingMode: SortingMode = SortingMode.NAME
-        val defaultReverseOrder: Boolean = false
-        val defaultFoldersFirst: Boolean = true
+
+        private val defaultSortingMode: SortingMode = SortingMode.NAME
+        const val defaultReverseOrder: Boolean = false
+        const val defaultFoldersFirst: Boolean = true
 
         private const val INITIAL_SORTING_MODE = "INITIAL_FOLDERS_FIRST"
         private const val INITIAL_REVERSE_ORDER = "INITIAL_REVERSE_ORDER"
